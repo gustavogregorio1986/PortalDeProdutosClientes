@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Data/">
+    <Project Path="PortalDeProdutosClientes.Data/PortalDeProdutosClientes.Data.csproj" Id="63e4250a-c8a4-4bf0-bde8-210be9eecbae" />
+  </Folder>
+  <Folder Name="/Dominain/">
+    <Project Path="PortalDeProdutosClientes.Dominain/PortalDeProdutosClientes.Dominain.csproj" Id="7bbed167-3d27-46ec-8ebb-ddd9379d46c4" />
+  </Folder>
+  <Folder Name="/PortalDeProdutosClientes/">
+    <Project Path="PortalDeProdutosClientesAPI/PortalDeProdutosClientesAPI.csproj" Id="d4f2bfef-2e78-418a-9268-025a66e0a2b2" />
+  </Folder>
+  <Folder Name="/Repository/">
+    <Project Path="PortalDeProdutosClientes.Repository/PortalDeProdutosClientes.Repository.csproj" Id="d07372ff-291f-4b49-9fdb-0f35ceff3846" />
+  </Folder>
+  <Folder Name="/Service/">
+    <Project Path="PortalDeProdutosClientes.Service/PortalDeProdutosClientes.Service.csproj" Id="d7897ecc-46a2-4154-99bb-73a5b03d8460" />
+  </Folder>
+</Solution>
