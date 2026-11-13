@@ -23,6 +23,7 @@
     <ProjectReference Include="..\PortalDeProdutosClientes.Dominain\PortalDeProdutosClientes.Dominain.csproj" />
     <ProjectReference Include="..\PortalDeProdutosClientes.Repository\PortalDeProdutosClientes.Repository.csproj" />
     <ProjectReference Include="..\PortalDeProdutosClientes.Service\PortalDeProdutosClientes.Service.csproj" />
+    <ProjectReference Include="..\PortalDeProdutosClientes\PortalDeProdutosClientes.csproj" />
   </ItemGroup>
 
 </Project>

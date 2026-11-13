@@ -5,6 +5,9 @@
   <Folder Name="/Dominain/">
     <Project Path="PortalDeProdutosClientes.Dominain/PortalDeProdutosClientes.Dominain.csproj" Id="7bbed167-3d27-46ec-8ebb-ddd9379d46c4" />
   </Folder>
+  <Folder Name="/DTO/">
+    <Project Path="PortalDeProdutosClientes/PortalDeProdutosClientes.csproj" Id="9f616309-1d4e-4d16-bc79-fedfad856635" />
+  </Folder>
   <Folder Name="/PortalDeProdutosClientes/">
     <Project Path="PortalDeProdutosClientesAPI/PortalDeProdutosClientesAPI.csproj" Id="d4f2bfef-2e78-418a-9268-025a66e0a2b2" />
   </Folder>
