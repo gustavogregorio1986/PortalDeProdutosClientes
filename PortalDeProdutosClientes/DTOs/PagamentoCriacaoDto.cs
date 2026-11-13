@@ -1,16 +1,9 @@
 ﻿using PortalDeProdutosClientes.Dominain.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortalDeProdutosClientes.DTOs
 {
-    public class PagamentoDto
+    public class PagamentoCriacaoDto
     {
-        public int Id { get; set; }
-
         public decimal? Dinheiro { get; set; }
 
         public decimal? Troco { get; set; }
@@ -23,8 +16,6 @@ namespace PortalDeProdutosClientes.DTOs
 
         public StatusCartao StatusCartao { get; set; }
 
-        public int ProdutoId { get; set; }
-
-        public ProdutoDto Produto { get; set; }
+        public int ProdutoId { get; set; } // 👈 Apenas o ID é necessário na criação!
     }
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace PortalDeProdutosClientes.DTOs
 {
      // DTO Principal do Produto(para cadastros, edições ou detalhes completos)
-    public class ProdutoDto
+    public class ProdutoCriacaoDto
     {
         public int Id { get; set; }
         public string NomeProduto { get; set; }
@@ -20,6 +20,6 @@ namespace PortalDeProdutosClientes.DTOs
         public int ClienteId { get; set; }
 
         // Relacionamento: Lista de pagamentos associados a este produto (usando DTO e não a entidade)
-        public List<PagamentoResumoDto> Pagamentos { get; set; }
+        public List<PagamentoCriacaoDto> Pagamentos { get; set; }
     }
 }

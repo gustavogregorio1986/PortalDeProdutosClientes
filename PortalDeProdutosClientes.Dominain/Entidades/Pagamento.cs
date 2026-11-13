@@ -25,6 +25,6 @@ namespace PortalDeProdutosClientes.Dominain.Entidades
 
         public int ProdutoId { get; set; }
 
-        public Produto Produto { get; set; }
+        public Produto? Produto { get; set; }
     }
 }

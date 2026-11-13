@@ -18,7 +18,7 @@ namespace PortalDeProdutosClientes.Repository.Repositorio
             _context = context;
         }
 
-        public async Task<Produto> AdiocinarCliente(Produto produto)
+        public async Task<Produto> AdiocinarProduto(Produto produto)
         {
             await _context.AddAsync(produto);
             await _context.SaveChangesAsync();
