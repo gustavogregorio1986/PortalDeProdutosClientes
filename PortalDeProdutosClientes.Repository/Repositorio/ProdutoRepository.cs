@@ -1,4 +1,5 @@
-﻿using PortalDeProdutosClientes.Dominain.Entidades;
+﻿using PortalDeProdutosClientes.Data.Data;
+using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Repository.Interface;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,18 @@ namespace PortalDeProdutosClientes.Repository.Repositorio
 {
     public class ProdutoRepository : IProdutoRepository
     {
-        public Task<Produto> AdiocinarCliente(Produto produto)
+        private readonly AppDbContext _context;
+
+        public ProdutoRepository(AppDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
+        }
+
+        public async Task<Produto> AdiocinarCliente(Produto produto)
+        {
+            await _context.AddAsync(produto);
+            await _context.SaveChangesAsync();
+            return produto;
         }
     }
 }

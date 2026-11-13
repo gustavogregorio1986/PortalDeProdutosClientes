@@ -1,13 +1,22 @@
-﻿using PortalDeProdutosClientes.Dominain.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PortalDeProdutosClientes.Dominain.Entidades;
+using PortalDeProdutosClientes.Dominain.Repository.Interface;
+using PortalDeProdutosClientes.Dominain.Services;
+
 
 namespace PortalDeProdutosClientes.Service.Services
 {
     public class PagamentoService : IPagamentoService
     {
+        private readonly IPagamentoRepository _repository;
+
+        public PagamentoService(IPagamentoRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public async Task<Pagamento> AdicionarPagamento(Pagamento pagamento)
+        {
+            return await _repository.AdiocinarPagamento(pagamento);
+        }
     }
 }

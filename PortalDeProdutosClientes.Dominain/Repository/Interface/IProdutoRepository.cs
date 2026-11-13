@@ -9,7 +9,7 @@ namespace PortalDeProdutosClientes.Dominain.Repository.Interface
 {
     public interface IProdutoRepository
     {
-        Task<Produto> AdiocinarCliente(Produto produto);
+        Task<Produto> AdiocinarProduto(Produto produto);
 
     }
 }

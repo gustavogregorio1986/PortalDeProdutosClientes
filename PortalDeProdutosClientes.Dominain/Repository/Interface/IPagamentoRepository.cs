@@ -9,7 +9,7 @@ namespace PortalDeProdutosClientes.Dominain.Repository.Interface
 {
     public interface IPagamentoRepository
     {
-        Task<Pagamento> AdiocinarCliente(Pagamento pagamento);
+        Task<Pagamento> AdiocinarPagamento(Pagamento pagamento);
 
     }
 }
