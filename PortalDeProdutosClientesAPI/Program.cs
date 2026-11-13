@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using PortalDeProdutosClientes.Data.Data;
+using PortalDeProdutosClientes.Dominain.Repository.Interface;
+using PortalDeProdutosClientes.Dominain.Services;
+using PortalDeProdutosClientes.Repository.Repositorio;
+using PortalDeProdutosClientes.Service.Services;
 
 namespace PortalDeProdutosClientesAPI
 {
@@ -17,6 +21,15 @@ namespace PortalDeProdutosClientesAPI
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+            builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+            builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
+
+            builder.Services.AddScoped<IClienteService, ClienteService>();
+            builder.Services.AddScoped<IProdutoService, ProdutoService>();
+            builder.Services.AddScoped<IPagamentoService, PagamentoService>();
+
 
             var app = builder.Build();
 
