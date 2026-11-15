@@ -11,5 +11,7 @@ namespace PortalDeProdutosClientes.Dominain.Repository.Interface
     {
         Task<Produto> AdiocinarProduto(Produto produto);
 
+        Task<List<Produto>> ListarTodosProdutos();
+
     }
 }

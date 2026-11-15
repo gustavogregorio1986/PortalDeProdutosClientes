@@ -10,5 +10,7 @@ namespace PortalDeProdutosClientes.Dominain.Repository.Interface
     public interface IClienteRepository
     {
         Task<Cliente> AdiocinarCliente(Cliente cliente);
+
+        Task<List<Cliente>> ListarTodosClientes();
     }
 }

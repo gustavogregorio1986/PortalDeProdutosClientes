@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Services;
 using PortalDeProdutosClientes.DTOs;
+using PortalDeProdutosClientes.Service.Services;
 
 namespace PortalDeProdutosClientesAPI.Controllers
 {
@@ -63,6 +64,12 @@ namespace PortalDeProdutosClientesAPI.Controllers
             {
                 return BadRequest(new { Mensagem = "Erro ao cadastrar produto.", Erro = ex.Message });
             }
+        }
+
+        [HttpGet]
+        public async Task<List<Produto>> ListarTodosProdutos()
+        {
+            return await _produtoService.ListarTodosProdutos();
         }
     }
 }

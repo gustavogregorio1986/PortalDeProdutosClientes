@@ -10,5 +10,7 @@ namespace PortalDeProdutosClientes.Dominain.Services
     public interface IProdutoService
     {
         Task<Produto> AdiocinarProduto(Produto produto);
+
+        Task<List<Produto>> ListarTodosProdutos();
     }
 }

@@ -10,5 +10,7 @@ namespace PortalDeProdutosClientes.Dominain.Services
     public interface IClienteService
     {
         Task<Cliente> AdiocinarCliente(Cliente cliente);
+
+        Task<List<Cliente>> ListarTodosClientes();
     }
 }

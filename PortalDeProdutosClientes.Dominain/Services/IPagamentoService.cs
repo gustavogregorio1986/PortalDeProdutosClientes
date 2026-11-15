@@ -10,5 +10,7 @@ namespace PortalDeProdutosClientes.Dominain.Services
     public interface IPagamentoService
     {
         Task<Pagamento> AdicionarPagamento(Pagamento pagamento);
+
+        Task<List<Pagamento>> ListarTodosPagamentos();
     }
 }

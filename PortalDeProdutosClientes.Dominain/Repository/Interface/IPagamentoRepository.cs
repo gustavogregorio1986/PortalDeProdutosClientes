@@ -11,5 +11,7 @@ namespace PortalDeProdutosClientes.Dominain.Repository.Interface
     {
         Task<Pagamento> AdiocinarPagamento(Pagamento pagamento);
 
+        Task<List<Pagamento>> ListarTodosPagamentos();
+
     }
 }

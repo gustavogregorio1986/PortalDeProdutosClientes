@@ -59,5 +59,11 @@ namespace PortalDeProdutosClientesAPI.Controllers
                 return BadRequest(new { Mensagem = "Erro ao cadastrar cliente.", Erro = ex.Message });
             }
         }
+
+        [HttpGet]
+        public async Task<List<Cliente>> ListarTodosClientes()
+        {
+            return await _clienteService.ListarTodosClientes();
+        }
     }
 }

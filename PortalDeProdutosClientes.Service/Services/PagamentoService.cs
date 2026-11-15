@@ -18,5 +18,10 @@ namespace PortalDeProdutosClientes.Service.Services
         {
             return await _repository.AdiocinarPagamento(pagamento);
         }
+
+        public async Task<List<Pagamento>> ListarTodosPagamentos()
+        {
+            return await _repository.ListarTodosPagamentos();
+        }
     }
 }

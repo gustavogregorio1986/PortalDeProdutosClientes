@@ -1,4 +1,5 @@
-﻿using PortalDeProdutosClientes.Data.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PortalDeProdutosClientes.Data.Data;
 using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Repository.Interface;
 using System;
@@ -24,6 +25,11 @@ namespace PortalDeProdutosClientes.Repository.Repositorio
             await _context.SaveChangesAsync();
             return cliente;
 
+        }
+
+        public async Task<List<Cliente>> ListarTodosClientes()
+        {
+            return await _context.Clientes.Include(c => c.Produtos).ToListAsync();
         }
     }
 }

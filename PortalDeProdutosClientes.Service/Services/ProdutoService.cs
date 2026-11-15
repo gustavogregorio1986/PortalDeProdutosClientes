@@ -18,5 +18,10 @@ namespace PortalDeProdutosClientes.Service.Services
         {
             return await _repository.AdiocinarProduto(produto);
         }
+
+        public async Task<List<Produto>> ListarTodosProdutos()
+        {
+            return await _repository.ListarTodosProdutos();
+        }
     }
 }
