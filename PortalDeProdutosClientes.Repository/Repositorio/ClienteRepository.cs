@@ -31,5 +31,24 @@ namespace PortalDeProdutosClientes.Repository.Repositorio
         {
             return await _context.Clientes.Include(c => c.Produtos).ToListAsync();
         }
+
+        public async Task AtualizarAsync(Cliente cliente)
+        {
+            _context.Clientes.Update(cliente);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeletarAsync(Cliente cliente)
+        {
+            _context.Clientes.Remove(cliente);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Cliente?> BuscarPorIdAsync(int id)
+        {
+            return await _context.Clientes
+            .Include(c => c.Produtos)
+            .FirstOrDefaultAsync(c => c.Id == id);
+        }
     }
 }

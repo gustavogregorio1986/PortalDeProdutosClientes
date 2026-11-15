@@ -66,6 +66,35 @@ namespace PortalDeProdutosClientesAPI.Controllers
             }
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Atualizar(int id, [FromBody] Pagamento pagamento)
+        {
+            if (id != pagamento.Id) return BadRequest();
+
+            var existente = await _pagamentoService.BuscarPorIdAsync(id);
+            if (existente == null) return NotFound();
+
+            await _pagamentoService.AtualizarPagamentoAsync(pagamento);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Deletar(int id)
+        {
+            var sucesso = await _pagamentoService.DeletarPagamentoAsync(id);
+            if (!sucesso) return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ObterPorId(int id)
+        {
+            var pagamento = await _pagamentoService.BuscarPorIdAsync(id);
+            if (pagamento == null) return NotFound();
+            return Ok(pagamento);
+        }
+
         [HttpGet]
         public async Task<List<Pagamento>> ListarTodosPagamentos()
         {

@@ -13,5 +13,10 @@ namespace PortalDeProdutosClientes.Dominain.Repository.Interface
 
         Task<List<Pagamento>> ListarTodosPagamentos();
 
+        Task<Pagamento?> BuscarPorIdAsync(int id);
+
+        Task AtualizarAsync(Pagamento pagamento);
+        Task DeletarAsync(int id);
+
     }
 }

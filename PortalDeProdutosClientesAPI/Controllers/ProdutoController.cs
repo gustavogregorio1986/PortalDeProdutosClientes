@@ -66,6 +66,35 @@ namespace PortalDeProdutosClientesAPI.Controllers
             }
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Atualizar(int id, [FromBody] Produto produto)
+        {
+            if (id != produto.Id) return BadRequest();
+
+            var existente = await _produtoService.BuscarPorIdAsync(id);
+            if (existente == null) return NotFound();
+
+            await _produtoService.AtualizarProdutoAsync(produto);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Deletar(int id)
+        {
+            var sucesso = await _produtoService.DeletarProdutoAsync(id);
+            if (!sucesso) return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ObterPorId(int id)
+        {
+            var cliente = await _produtoService.BuscarPorIdAsync(id);
+            if (cliente == null) return NotFound();
+            return Ok(cliente);
+        }
+
         [HttpGet]
         public async Task<List<Produto>> ListarTodosProdutos()
         {

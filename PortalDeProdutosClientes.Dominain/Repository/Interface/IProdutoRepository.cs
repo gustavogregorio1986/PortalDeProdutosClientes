@@ -13,5 +13,10 @@ namespace PortalDeProdutosClientes.Dominain.Repository.Interface
 
         Task<List<Produto>> ListarTodosProdutos();
 
+        Task<Produto?> BuscarPorIdAsync(int id);
+
+        Task AtualizarAsync(Produto produto);
+        Task DeletarAsync(int id);
+
     }
 }

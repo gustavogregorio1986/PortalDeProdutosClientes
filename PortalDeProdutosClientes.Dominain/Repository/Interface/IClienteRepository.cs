@@ -12,5 +12,10 @@ namespace PortalDeProdutosClientes.Dominain.Repository.Interface
         Task<Cliente> AdiocinarCliente(Cliente cliente);
 
         Task<List<Cliente>> ListarTodosClientes();
+
+        Task AtualizarAsync(Cliente cliente);
+        Task DeletarAsync(Cliente cliente);
+
+        Task<Cliente?> BuscarPorIdAsync(int id);
     }
 }

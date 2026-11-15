@@ -12,5 +12,10 @@ namespace PortalDeProdutosClientes.Dominain.Services
         Task<Pagamento> AdicionarPagamento(Pagamento pagamento);
 
         Task<List<Pagamento>> ListarTodosPagamentos();
+
+        Task AtualizarPagamentoAsync(Pagamento pagamento);
+        Task<bool> DeletarPagamentoAsync(int id);
+
+        Task<Pagamento?> BuscarPorIdAsync(int id);
     }
 }

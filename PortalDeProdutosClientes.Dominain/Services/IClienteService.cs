@@ -12,5 +12,10 @@ namespace PortalDeProdutosClientes.Dominain.Services
         Task<Cliente> AdiocinarCliente(Cliente cliente);
 
         Task<List<Cliente>> ListarTodosClientes();
+
+        Task AtualizarClienteAsync(Cliente cliente);
+        Task<bool> DeletarClienteAsync(int id);
+
+        Task<Cliente?> BuscarPorIdAsync(int id);
     }
 }

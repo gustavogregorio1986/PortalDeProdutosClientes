@@ -12,5 +12,9 @@ namespace PortalDeProdutosClientes.Dominain.Services
         Task<Produto> AdiocinarProduto(Produto produto);
 
         Task<List<Produto>> ListarTodosProdutos();
+
+        Task AtualizarProdutoAsync(Produto produto);
+        Task<bool> DeletarProdutoAsync(int id);
+        Task<Produto?> BuscarPorIdAsync(int id);
     }
 }
