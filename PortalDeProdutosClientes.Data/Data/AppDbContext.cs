@@ -2,12 +2,7 @@
 using PortalDeProdutosClientes.Domain.Entidades;
 using PortalDeProdutosClientes.Domain.Entities;
 using PortalDeProdutosClientes.Dominain.Entidades;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace PortalDeProdutosClientes.Data.Data
 {

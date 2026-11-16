@@ -159,6 +159,9 @@ namespace PortalDeProdutosClientes.Data.Migrations
                     b.Property<int>("StatusCartao")
                         .HasColumnType("int");
 
+                    b.Property<int>("StatusPagamento")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("Troco")
                         .HasColumnType("decimal(18,2)");
 

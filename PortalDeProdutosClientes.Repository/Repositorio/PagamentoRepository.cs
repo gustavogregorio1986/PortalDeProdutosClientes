@@ -2,11 +2,6 @@
 using PortalDeProdutosClientes.Data.Data;
 using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Repository.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortalDeProdutosClientes.Repository.Repositorio
 {
@@ -19,16 +14,25 @@ namespace PortalDeProdutosClientes.Repository.Repositorio
             _context = context;
         }
 
-        public async Task<Pagamento> AdiocinarPagamento(Pagamento pagamento)
+        public async Task<Pagamento> AdicionarAsync(Pagamento pagamento)
         {
-            await _context.AddAsync(pagamento);
-            await _context.SaveChangesAsync();
+            await _context.Pagamentos.AddAsync(pagamento);
+            await _context.SaveChangesAsync(); // Dispara o SaveChangesAsync interceptado pela auditoria
             return pagamento;
         }
 
         public async Task<List<Pagamento>> ListarTodosPagamentos()
         {
-            return await _context.Pagamentos.ToListAsync();
+            return await _context.Pagamentos
+                .Include(p => p.Produto) // Traz os dados do produto junto
+                .ToListAsync();
+        }
+
+        public async Task<Pagamento?> BuscarPorIdAsync(int id)
+        {
+            return await _context.Pagamentos
+               .Include(p => p.Produto)
+               .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task AtualizarAsync(Pagamento pagamento)
@@ -37,23 +41,14 @@ namespace PortalDeProdutosClientes.Repository.Repositorio
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeletarAsync(Pagamento pagamento)
-        {
-            _context.Pagamentos.Remove(pagamento);
-            await _context.SaveChangesAsync();
-        }
-
-      
         public async Task DeletarAsync(int id)
         {
-            await _context.Pagamentos
-           .FirstOrDefaultAsync(c => c.Id == id);
-        }
-
-        public async Task<Pagamento?> BuscarPorIdAsync(int id)
-        {
-            return await _context.Pagamentos
-               .FirstOrDefaultAsync(c => c.Id == id);
+            var pagamento = await BuscarPorIdAsync(id);
+            if (pagamento != null)
+            {
+                _context.Pagamentos.Remove(pagamento);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

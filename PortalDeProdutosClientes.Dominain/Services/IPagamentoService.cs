@@ -17,5 +17,7 @@ namespace PortalDeProdutosClientes.Dominain.Services
         Task<bool> DeletarPagamentoAsync(int id);
 
         Task<Pagamento?> BuscarPorIdAsync(int id);
+
+        Task<Pagamento> ProcessarEfetivacaoPagamentoAsync(Pagamento pagamento);
     }
 }

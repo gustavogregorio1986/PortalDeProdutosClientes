@@ -1,4 +1,5 @@
-﻿using PortalDeProdutosClientes.Dominain.Enum;
+﻿using PortalDeProdutosClientes.Domain.Enums; // Ajustado para o namespace correto
+using PortalDeProdutosClientes.Dominain.Enum; // Mantenha se estiver usando em outro lugar
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +24,10 @@ namespace PortalDeProdutosClientes.Dominain.Entidades
 
         public StatusCartao StatusCartao { get; set; }
 
+        public StatusPagamento StatusPagamento { get; set; }
+
         public int ProdutoId { get; set; }
 
         public Produto? Produto { get; set; }
-    }
-}
+    } // <-- Fechamento correto da classe Pagamento
+} // <-- Fechamento correto do namespace

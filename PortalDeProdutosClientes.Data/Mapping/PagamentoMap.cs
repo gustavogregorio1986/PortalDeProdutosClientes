@@ -33,6 +33,10 @@ namespace PortalDeProdutosClientes.Data.Mappings
             builder.Property(p => p.StatusCartao)
                 .IsRequired();
 
+            builder.Property(p => p.StatusPagamento)
+                .IsRequired()
+                .HasConversion<int>(); // Salva o enum como inteiro (1, 2, 3) no banco
+
             // Relacionamento: Muitos Pagamentos pertencem a UM Produto (N para 1)
             builder.HasOne(p => p.Produto)
                 .WithMany(prod => prod.Pagamentos)

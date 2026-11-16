@@ -1,4 +1,5 @@
-﻿using PortalDeProdutosClientes.Dominain.Entidades;
+﻿using PortalDeProdutosClientes.Domain.Enums;
+using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Repository.Interface;
 using PortalDeProdutosClientes.Dominain.Services;
 using PortalDeProdutosClientes.Repository.Repositorio;
@@ -17,7 +18,7 @@ namespace PortalDeProdutosClientes.Service.Services
 
         public async Task<Pagamento> AdicionarPagamento(Pagamento pagamento)
         {
-            return await _repository.AdiocinarPagamento(pagamento);
+            return await _repository.AdicionarAsync(pagamento);
         }
 
         public async Task AtualizarPagamentoAsync(Pagamento pagamento)
@@ -42,6 +43,28 @@ namespace PortalDeProdutosClientes.Service.Services
         public async Task<List<Pagamento>> ListarTodosPagamentos()
         {
             return await _repository.ListarTodosPagamentos();
+        }
+
+        public async Task<Pagamento> ProcessarEfetivacaoPagamentoAsync(Pagamento pagamento)
+        {
+            // === LÓGICA DE DETECÇÃO DO STATUS ===
+            if (pagamento.Dinheiro.HasValue && pagamento.Dinheiro < pagamento.Preco)
+            {
+                pagamento.StatusPagamento = StatusPagamento.Recusado;
+            }
+            else if ((pagamento.Dinheiro.HasValue && pagamento.Dinheiro >= pagamento.Preco) ||
+                     (!string.IsNullOrEmpty(pagamento.Cartao) && pagamento.Preco > 0))
+            {
+                pagamento.StatusPagamento = StatusPagamento.Aprovado;
+            }
+            else
+            {
+                pagamento.StatusPagamento = StatusPagamento.Pendente;
+            }
+
+            // Salva no banco já com o status correto preenchido
+            await _repository.AdicionarAsync(pagamento);
+            return pagamento;
         }
     }
 }

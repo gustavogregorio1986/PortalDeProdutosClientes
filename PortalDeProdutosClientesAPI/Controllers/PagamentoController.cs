@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PortalDeProdutosClientes.Domain.Enums;
 using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Services;
 using PortalDeProdutosClientes.DTOs;
@@ -18,6 +19,7 @@ namespace PortalDeProdutosClientesAPI.Controllers
             _logAuditoriaService = logAuditoriaService;
         }
 
+        // Método POST único e unificado para registrar pagamentos com detecção de status
         [HttpPost]
         public async Task<IActionResult> RegistrarPagamento([FromBody] PagamentoCriacaoDto pagamentoDto)
         {
@@ -37,18 +39,25 @@ namespace PortalDeProdutosClientesAPI.Controllers
                     ProdutoId = pagamentoDto.ProdutoId
                 };
 
-                var pagamentoCriado = await _pagamentoService.AdicionarPagamento(pagamentoEntidade);
+                // 1. Processa a efetivação (detector de status: Aprovado, Recusado ou Pendente)
+                var pagamentoCriado = await _pagamentoService.ProcessarEfetivacaoPagamentoAsync(pagamentoEntidade);
 
+                // 2. Registra o log de auditoria
                 await _logAuditoriaService.RegistrarLogAsync(
                     acao: "CRIACAO",
                     usuarioId: "sistema-interno",
                     usuarioEmail: "admin@portaldeprodutos.com",
                     entidadeAfetada: "Pagamento",
                     registroId: pagamentoCriado.Id,
-                    detalhesJson: $"Pagamento no valor de R$ {pagamentoCriado.Preco} registrado com sucesso para o produto ID {pagamentoCriado.ProdutoId}."
+                    detalhesJson: $"Pagamento no valor de R$ {pagamentoCriado.Preco} registrado com status {pagamentoCriado.StatusPagamento} para o produto ID {pagamentoCriado.ProdutoId}."
                 );
 
-                return Ok(new { Mensagem = "Pagamento registrado com sucesso!", Dados = pagamentoCriado });
+                return Ok(new
+                {
+                    Mensagem = "Pagamento registrado com sucesso!",
+                    StatusDetectado = pagamentoCriado.StatusPagamento.ToString(),
+                    Dados = pagamentoCriado
+                });
             }
             catch (Exception ex)
             {
@@ -63,8 +72,6 @@ namespace PortalDeProdutosClientesAPI.Controllers
             return Ok(pagamentos);
         }
 
-
-
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterPorId(int id)
         {
@@ -73,44 +80,30 @@ namespace PortalDeProdutosClientesAPI.Controllers
             return Ok(pagamento);
         }
 
-        [HttpPost("popular-auditoria-antiga")]
-        public async Task<IActionResult> PopularAuditoriaAntiga()
+        [HttpPost("corrigir-status-antigos")]
+        public async Task<IActionResult> CorrigirStatusAntigos()
         {
-            try
+            var pagamentos = await _pagamentoService.ListarTodosPagamentos();
+            int corrigidos = 0;
+
+            foreach (var p in pagamentos)
             {
-                // 1. Busca todos os pagamentos cadastrados
-                var pagamentos = await _pagamentoService.ListarTodosPagamentos(); // Ajuste para o nome do método no seu service
-
-                if (pagamentos == null || !pagamentos.Any())
-                    return NotFound(new { Mensagem = "Nenhum pagamento encontrado para popular a auditoria." });
-
-                int totalProcessado = 0;
-
-                foreach (var pagamento in pagamentos)
+                // Se estiver com status 0 (ou Pendente incorreto), reavalia
+                if (p.StatusPagamento == 0)
                 {
-                    // 2. Registra a auditoria para cada pagamento existente
-                    await _logAuditoriaService.RegistrarLogAsync(
-                        acao: "IMPORTACAO_HISTORICO",
-                        usuarioId: "sistema-interno",
-                        usuarioEmail: "admin@portaldeprodutos.com",
-                        entidadeAfetada: "Pagamento",
-                        registroId: pagamento.Id,
-                        detalhesJson: $"Pagamento ID {pagamento.Id} no valor de R$ {pagamento.Preco} importado para o histórico de auditoria."
-                    );
+                    if (p.Dinheiro.HasValue && p.Dinheiro < p.Preco)
+                        p.StatusPagamento = StatusPagamento.Recusado;
+                    else if ((p.Dinheiro.HasValue && p.Dinheiro >= p.Preco) || (!string.IsNullOrEmpty(p.Cartao) && p.Preco > 0))
+                        p.StatusPagamento = StatusPagamento.Aprovado;
+                    else
+                        p.StatusPagamento = StatusPagamento.Pendente;
 
-                    totalProcessado++;
+                    await _pagamentoService.AtualizarPagamentoAsync(p);
+                    corrigidos++;
                 }
+            }
 
-                return Ok(new
-                {
-                    Mensagem = "Histórico de auditoria populado com sucesso para todos os pagamentos!",
-                    TotalImportados = totalProcessado
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Mensagem = "Erro ao popular auditoria de pagamentos.", Erro = ex.Message });
-            }
+            return Ok(new { Mensagem = "Status corrigidos com sucesso!", TotalCorrigidos = corrigidos });
         }
 
         [HttpPut("{id}")]

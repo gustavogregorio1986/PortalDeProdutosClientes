@@ -2,7 +2,6 @@
 using PortalDeProdutosClientes.Data.Data;
 using PortalDeProdutosClientes.Domain.Entities;
 using PortalDeProdutosClientes.Domain.Interfaces;
-using PortalDeProdutosClientes.Infrastructure.Data;
 
 namespace PortalDeProdutosClientes.Infrastructure.Repositories
 {
