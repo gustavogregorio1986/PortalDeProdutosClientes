@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using PortalDeProdutosClientes.Application.Interfaces;
+using PortalDeProdutosClientes.Application.Services;
 using PortalDeProdutosClientes.Data.Data;
+using PortalDeProdutosClientes.Domain.Interfaces;
 using PortalDeProdutosClientes.Dominain.Repository.Interface;
 using PortalDeProdutosClientes.Dominain.Services;
+using PortalDeProdutosClientes.Infrastructure.Repositories;
 using PortalDeProdutosClientes.Repository;
 using PortalDeProdutosClientes.Repository.Repositorio;
 using PortalDeProdutosClientes.Service.Services;
@@ -28,11 +32,13 @@ namespace PortalDeProdutosClientesAPI
             builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
             builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
             builder.Services.AddScoped<ILogAuditoriaRepository, LogAuditoriaRepository>();
+            builder.Services.AddScoped<IAuditRepository, AuditRepository>();
 
             builder.Services.AddScoped<IClienteService, ClienteService>();
             builder.Services.AddScoped<IProdutoService, ProdutoService>();
             builder.Services.AddScoped<IPagamentoService, PagamentoService>();
             builder.Services.AddScoped<ILogAuditoriaService, LogAuditoriaService>();
+            builder.Services.AddScoped<IAuditService, AuditService>();
 
             builder.Services.AddStackExchangeRedisCache(options =>
             {
