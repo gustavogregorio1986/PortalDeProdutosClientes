@@ -34,6 +34,12 @@ namespace PortalDeProdutosClientesAPI
             builder.Services.AddScoped<IPagamentoService, PagamentoService>();
             builder.Services.AddScoped<ILogAuditoriaService, LogAuditoriaService>();
 
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+                options.InstanceName = "PortalCache_";
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
