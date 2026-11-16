@@ -17,5 +17,7 @@ namespace PortalDeProdutosClientes.DTOs
         public StatusCartao StatusCartao { get; set; }
 
         public int ProdutoId { get; set; } // 👈 Apenas o ID é necessário na criação!
+
+        public int ClienteId { get; set; }
     }
 }

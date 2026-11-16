@@ -2,8 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using PortalDeProdutosClientes.Data.Data;
 using PortalDeProdutosClientes.Dominain.Repository.Interface;
 using PortalDeProdutosClientes.Dominain.Services;
+using PortalDeProdutosClientes.Repository;
 using PortalDeProdutosClientes.Repository.Repositorio;
 using PortalDeProdutosClientes.Service.Services;
+using PortalDeProdutosClientes.Services;
 
 namespace PortalDeProdutosClientesAPI
 {
@@ -25,11 +27,12 @@ namespace PortalDeProdutosClientesAPI
             builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
             builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
             builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
+            builder.Services.AddScoped<ILogAuditoriaRepository, LogAuditoriaRepository>();
 
             builder.Services.AddScoped<IClienteService, ClienteService>();
             builder.Services.AddScoped<IProdutoService, ProdutoService>();
             builder.Services.AddScoped<IPagamentoService, PagamentoService>();
-
+            builder.Services.AddScoped<ILogAuditoriaService, LogAuditoriaService>();
 
             var app = builder.Build();
 

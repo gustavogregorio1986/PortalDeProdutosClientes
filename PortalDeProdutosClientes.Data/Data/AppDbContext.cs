@@ -25,6 +25,8 @@ namespace PortalDeProdutosClientes.Data.Data
 
         public DbSet<LogAuditoria> LogAuditorias { get; set; }
 
+        public DbSet<LogAuditoria> LogAuditoriass { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

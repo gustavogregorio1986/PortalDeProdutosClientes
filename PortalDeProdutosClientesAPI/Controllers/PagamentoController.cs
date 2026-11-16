@@ -1,78 +1,125 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Services;
 using PortalDeProdutosClientes.DTOs;
-using PortalDeProdutosClientes.Service.Services;
 
 namespace PortalDeProdutosClientesAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PagamentoController : ControllerBase
+    public class PagamentosController : ControllerBase
     {
         private readonly IPagamentoService _pagamentoService;
+        private readonly ILogAuditoriaService _logAuditoriaService;
 
-        public PagamentoController(IPagamentoService pagamentoService)
+        public PagamentosController(IPagamentoService pagamentoService, ILogAuditoriaService logAuditoriaService)
         {
             _pagamentoService = pagamentoService;
+            _logAuditoriaService = logAuditoriaService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Cadastrar([FromBody] PagamentoCriacaoDto dto)
+        public async Task<IActionResult> RegistrarPagamento([FromBody] PagamentoCriacaoDto pagamentoDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                // 1. Converte o DTO de Entrada para a Entidade de Domínio (Pagamento)
                 var pagamentoEntidade = new Pagamento
                 {
-                    Dinheiro = dto.Dinheiro,
-                    Troco = dto.Troco,
-                    Preco = dto.Preco,
-                    Cartao = dto.Cartao,
-                    Parcela = dto.Parcela,
-                    StatusCartao = dto.StatusCartao,
-                    ProdutoId = dto.ProdutoId
+                    Dinheiro = pagamentoDto.Dinheiro,
+                    Troco = pagamentoDto.Troco,
+                    Preco = pagamentoDto.Preco,
+                    Cartao = pagamentoDto.Cartao,
+                    Parcela = pagamentoDto.Parcela,
+                    StatusCartao = pagamentoDto.StatusCartao,
+                    ProdutoId = pagamentoDto.ProdutoId
                 };
 
-                // 2. Salva no banco via Service/Repositório (retorna a entidade com o ID preenchido)
-                var pagamentoSalvo = await _pagamentoService.AdicionarPagamento(pagamentoEntidade);
+                var pagamentoCriado = await _pagamentoService.AdicionarPagamento(pagamentoEntidade);
 
-                // 3. Converte a Entidade salva de volta para o DTO de Resposta (Usando PagamentoDto para ter o ID)
-                var pagamentoDtoRetorno = new PagamentoCriacaoDto
+                await _logAuditoriaService.RegistrarLogAsync(
+                    acao: "CRIACAO",
+                    usuarioId: "sistema-interno",
+                    usuarioEmail: "admin@portaldeprodutos.com",
+                    entidadeAfetada: "Pagamento",
+                    registroId: pagamentoCriado.Id,
+                    detalhesJson: $"Pagamento no valor de R$ {pagamentoCriado.Preco} registrado com sucesso para o produto ID {pagamentoCriado.ProdutoId}."
+                );
+
+                return Ok(new { Mensagem = "Pagamento registrado com sucesso!", Dados = pagamentoCriado });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Mensagem = "Erro ao registrar pagamento.", Erro = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ListarTodos()
+        {
+            var pagamentos = await _pagamentoService.ListarTodosPagamentos();
+            return Ok(pagamentos);
+        }
+
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ObterPorId(int id)
+        {
+            var pagamento = await _pagamentoService.BuscarPorIdAsync(id);
+            if (pagamento == null) return NotFound(new { Mensagem = "Pagamento não encontrado." });
+            return Ok(pagamento);
+        }
+
+        [HttpPost("popular-auditoria-antiga")]
+        public async Task<IActionResult> PopularAuditoriaAntiga()
+        {
+            try
+            {
+                // 1. Busca todos os pagamentos cadastrados
+                var pagamentos = await _pagamentoService.ListarTodosPagamentos(); // Ajuste para o nome do método no seu service
+
+                if (pagamentos == null || !pagamentos.Any())
+                    return NotFound(new { Mensagem = "Nenhum pagamento encontrado para popular a auditoria." });
+
+                int totalProcessado = 0;
+
+                foreach (var pagamento in pagamentos)
                 {
-                    Dinheiro = pagamentoSalvo.Dinheiro,
-                    Troco = pagamentoSalvo.Troco,
-                    Preco = pagamentoSalvo.Preco,
-                    Cartao = pagamentoSalvo.Cartao,
-                    Parcela = pagamentoSalvo.Parcela,
-                    StatusCartao = pagamentoSalvo.StatusCartao,
-                    ProdutoId = pagamentoSalvo.ProdutoId
-                };
+                    // 2. Registra a auditoria para cada pagamento existente
+                    await _logAuditoriaService.RegistrarLogAsync(
+                        acao: "IMPORTACAO_HISTORICO",
+                        usuarioId: "sistema-interno",
+                        usuarioEmail: "admin@portaldeprodutos.com",
+                        entidadeAfetada: "Pagamento",
+                        registroId: pagamento.Id,
+                        detalhesJson: $"Pagamento ID {pagamento.Id} no valor de R$ {pagamento.Preco} importado para o histórico de auditoria."
+                    );
 
-                // 4. Retorna o sucesso encapsulado no Ok() da API
+                    totalProcessado++;
+                }
+
                 return Ok(new
                 {
-                    Mensagem = "Pagamento cadastrado com sucesso!",
-                    Dados = pagamentoDtoRetorno
+                    Mensagem = "Histórico de auditoria populado com sucesso para todos os pagamentos!",
+                    TotalImportados = totalProcessado
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Mensagem = "Erro ao cadastrar pagamento.", Erro = ex.Message });
+                return BadRequest(new { Mensagem = "Erro ao popular auditoria de pagamentos.", Erro = ex.Message });
             }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Atualizar(int id, [FromBody] Pagamento pagamento)
         {
-            if (id != pagamento.Id) return BadRequest();
+            if (id != pagamento.Id) return BadRequest(new { Mensagem = "ID divergente." });
 
             var existente = await _pagamentoService.BuscarPorIdAsync(id);
-            if (existente == null) return NotFound();
+            if (existente == null) return NotFound(new { Mensagem = "Pagamento não encontrado." });
 
             await _pagamentoService.AtualizarPagamentoAsync(pagamento);
             return NoContent();
@@ -82,23 +129,9 @@ namespace PortalDeProdutosClientesAPI.Controllers
         public async Task<IActionResult> Deletar(int id)
         {
             var sucesso = await _pagamentoService.DeletarPagamentoAsync(id);
-            if (!sucesso) return NotFound();
+            if (!sucesso) return NotFound(new { Mensagem = "Pagamento não encontrado." });
 
             return NoContent();
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ObterPorId(int id)
-        {
-            var pagamento = await _pagamentoService.BuscarPorIdAsync(id);
-            if (pagamento == null) return NotFound();
-            return Ok(pagamento);
-        }
-
-        [HttpGet]
-        public async Task<List<Pagamento>> ListarTodosPagamentos()
-        {
-            return await _pagamentoService.ListarTodosPagamentos();
         }
     }
 }
