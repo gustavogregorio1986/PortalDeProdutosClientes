@@ -160,5 +160,43 @@ namespace PortalDeProdutosClientesAPI.Controllers
             var nomeArquivo = $"relatorio-pagamentos-{DateTime.Now:yyyyMMdd-HHmm}.pdf";
             return File(pdfBytes, "application/pdf", nomeArquivo);
         }
+
+        [HttpGet("exportar-pdf-por-ano")]
+        public async Task<IActionResult> ExportarPdfPorAno()
+        {
+            var pagamentos = await _pagamentoService.ListarTodosPagamentos();
+
+            if (!pagamentos.Any())
+                return NotFound("Nenhum pagamento encontrado para gerar o relatório anual.");
+
+            // 1. Agrupa os pagamentos por Ano usando LINQ
+            var totaisPorAno = pagamentos
+                .GroupBy(p => p.DataPagamento.Year) // Agrupa pelo ano da data do pagamento
+                .Select(grupo => new PagamentoTotalAnualDto
+                {
+                    Ano = grupo.Key,
+                    TotalArrecadado = grupo.Where(x => x.Preco.HasValue).Sum(x => x.Preco.Value),
+                    QuantidadePagamentos = grupo.Count()
+                })
+                .OrderBy(x => x.Ano)
+                .ToList();
+
+            // 2. Define as colunas para o PDF do resumo anual
+            var colunas = new Dictionary<string, Func<PagamentoTotalAnualDto, string>>
+    {
+        { "Ano", item => item.Ano.ToString() },
+        { "Qtd. Pagamentos", item => item.QuantidadePagamentos.ToString() },
+        { "Total Arrecadado", item => item.TotalArrecadado.ToString("C2") }
+    };
+
+            // 3. Gera o PDF utilizando o seu serviço existente
+            var pdfBytes = _relatorioPdfService.GerarTabelaPdf(
+                "Relatório de Totais por Ano - Portal de Produtos e Clientes",
+                totaisPorAno,
+                colunas);
+
+            var nomeArquivo = $"relatorio-pagamentos-por-ano-{DateTime.Now:yyyyMMdd-HHmm}.pdf";
+            return File(pdfBytes, "application/pdf", nomeArquivo);
+        }
     }
 }

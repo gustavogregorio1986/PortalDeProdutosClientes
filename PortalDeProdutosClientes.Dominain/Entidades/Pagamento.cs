@@ -17,6 +17,8 @@ namespace PortalDeProdutosClientes.Dominain.Entidades
 
         public int? Parcela { get; set; }
 
+        public DateTime DataPagamento { get; set; } = DateTime.Now;
+
         public StatusCartao StatusCartao { get; set; }
 
         public StatusPagamento StatusPagamento { get; set; }

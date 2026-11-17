@@ -144,6 +144,9 @@ namespace PortalDeProdutosClientes.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime>("DataPagamento")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal?>("Dinheiro")
                         .HasColumnType("decimal(18,2)");
 
