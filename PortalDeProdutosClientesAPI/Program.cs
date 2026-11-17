@@ -6,10 +6,13 @@ using PortalDeProdutosClientes.Domain.Interfaces;
 using PortalDeProdutosClientes.Dominain.Repository.Interface;
 using PortalDeProdutosClientes.Dominain.Services;
 using PortalDeProdutosClientes.Infrastructure.Repositories;
+using PortalDeProdutosClientes.Infrastructure.Services;
 using PortalDeProdutosClientes.Repository;
 using PortalDeProdutosClientes.Repository.Repositorio;
 using PortalDeProdutosClientes.Service.Services;
 using PortalDeProdutosClientes.Services;
+using QuestPDF.Infrastructure;
+
 
 namespace PortalDeProdutosClientesAPI
 {
@@ -39,6 +42,12 @@ namespace PortalDeProdutosClientesAPI
             builder.Services.AddScoped<IPagamentoService, PagamentoService>();
             builder.Services.AddScoped<ILogAuditoriaService, LogAuditoriaService>();
             builder.Services.AddScoped<IAuditService, AuditService>();
+
+            // Logo no topo do Program.cs
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            // Junto com os outros serviços (builder.Services...)
+            builder.Services.AddScoped<IRelatorioPdfService, RelatorioPdfService>();
 
             builder.Services.AddStackExchangeRedisCache(options =>
             {

@@ -1,10 +1,5 @@
 ﻿using PortalDeProdutosClientes.Domain.Enums; // Ajustado para o namespace correto
 using PortalDeProdutosClientes.Dominain.Enum; // Mantenha se estiver usando em outro lugar
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortalDeProdutosClientes.Dominain.Entidades
 {

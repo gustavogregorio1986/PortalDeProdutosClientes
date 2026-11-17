@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PortalDeProdutosClientes.Domain.Interfaces;
 using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Services;
 using PortalDeProdutosClientes.DTOs;
@@ -11,11 +12,13 @@ namespace PortalDeProdutosClientesAPI.Controllers
     {
         private readonly IProdutoService _produtoService;
         private readonly ILogAuditoriaService _logAuditoriaService;
+        private readonly IRelatorioPdfService _relatorioPdfService;
 
-        public ProdutosController(IProdutoService produtoService, ILogAuditoriaService logAuditoriaService)
+        public ProdutosController(IProdutoService produtoService, ILogAuditoriaService logAuditoriaService, IRelatorioPdfService relatorioPdfService)
         {
             _produtoService = produtoService;
             _logAuditoriaService = logAuditoriaService;
+            _relatorioPdfService = relatorioPdfService;
         }
 
         [HttpPost]
@@ -129,6 +132,34 @@ namespace PortalDeProdutosClientesAPI.Controllers
             if (!sucesso) return NotFound(new { Mensagem = "Produto não encontrado." });
 
             return NoContent();
+        }
+
+        [HttpGet("exportar-pdf")]
+        public async Task<IActionResult> ExportarPdf()
+        {
+            var produtos = await _produtoService.ListarTodosProdutos(); // ajuste para o método do seu service
+
+            if (!produtos.Any())
+                return NotFound("Nenhum produto encontrado para gerar o relatório.");
+
+            var colunas = new Dictionary<string, Func<Produto, string>>
+        {
+            { "ID", p => p.Id.ToString() },
+            { "Nome do Produto", p => string.IsNullOrEmpty(p.NomeProduto) ? "-" : p.NomeProduto },
+            { "Quantidade", p => p.Quantidade.ToString() },
+            { "Preço", p => p.Preco.ToString("C2") },
+            { "Unidades Restantes", p => p.UnidadesRestantes.ToString() },
+            { "Data de Fabricação", p => p.DataFabricacao.ToLocalTime().ToString("dd/MM/yyyy") },
+            { "Cliente ID", p => p.ClienteId.ToString() }
+        };
+
+            var pdfBytes = _relatorioPdfService.GerarTabelaPdf(
+                "Relatório de Produtos - Portal de Produtos e Clientes",
+                produtos,
+                colunas);
+
+            var nomeArquivo = $"relatorio-produtos-{DateTime.Now:yyyyMMdd-HHmm}.pdf";
+            return File(pdfBytes, "application/pdf", nomeArquivo);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PortalDeProdutosClientes.Domain.Enums;
+using PortalDeProdutosClientes.Domain.Interfaces;
 using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Services;
 using PortalDeProdutosClientes.DTOs;
@@ -12,11 +13,13 @@ namespace PortalDeProdutosClientesAPI.Controllers
     {
         private readonly IPagamentoService _pagamentoService;
         private readonly ILogAuditoriaService _logAuditoriaService;
+        private readonly IRelatorioPdfService _relatorioPdfService;
 
-        public PagamentosController(IPagamentoService pagamentoService, ILogAuditoriaService logAuditoriaService)
+        public PagamentosController(IPagamentoService pagamentoService, ILogAuditoriaService logAuditoriaService, IRelatorioPdfService relatorioPdfService)
         {
             _pagamentoService = pagamentoService;
             _logAuditoriaService = logAuditoriaService;
+            _relatorioPdfService = relatorioPdfService;
         }
 
         // Método POST único e unificado para registrar pagamentos com detecção de status
@@ -125,6 +128,37 @@ namespace PortalDeProdutosClientesAPI.Controllers
             if (!sucesso) return NotFound(new { Mensagem = "Pagamento não encontrado." });
 
             return NoContent();
+        }
+
+        [HttpGet("exportar-pdf")]
+        public async Task<IActionResult> ExportarPdf()
+        {
+            var pagamentos = await _pagamentoService.ListarTodosPagamentos(); // ajuste para o método do seu service
+
+            if (!pagamentos.Any())
+                return NotFound("Nenhum pagamento encontrado para gerar o relatório.");
+
+            var colunas = new Dictionary<string, Func<Pagamento, string>>
+        {
+            { "ID", p => p.Id.ToString() },
+            { "Produto ID", p => p.ProdutoId.ToString() },
+            { "Produto Nome", p => p.Produto != null ? p.Produto.NomeProduto : "-" },
+            { "Preço", p => p.Preco.HasValue ? p.Preco.Value.ToString("C2") : "-" },
+            { "Dinheiro", p => p.Dinheiro.HasValue ? p.Dinheiro.Value.ToString("C2") : "-" },
+            { "Troco", p => p.Troco.HasValue ? p.Troco.Value.ToString("C2") : "-" },
+            { "Cartão", p => string.IsNullOrEmpty(p.Cartao) ? "-" : p.Cartao },
+            { "Parcelas", p => p.Parcela.HasValue ? p.Parcela.Value.ToString() : "-" },
+            { "Status Cartão", p => p.StatusCartao.ToString() },
+            { "Status Pagamento", p => p.StatusPagamento.ToString() }
+        };
+
+            var pdfBytes = _relatorioPdfService.GerarTabelaPdf(
+                "Relatório de Pagamentos - Portal de Produtos e Clientes",
+                pagamentos,
+                colunas);
+
+            var nomeArquivo = $"relatorio-pagamentos-{DateTime.Now:yyyyMMdd-HHmm}.pdf";
+            return File(pdfBytes, "application/pdf", nomeArquivo);
         }
     }
 }

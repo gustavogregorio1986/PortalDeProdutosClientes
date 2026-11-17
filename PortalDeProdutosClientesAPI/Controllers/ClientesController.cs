@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PortalDeProdutosClientes.Domain.Interfaces;
 using PortalDeProdutosClientes.Dominain.Entidades;
 using PortalDeProdutosClientes.Dominain.Services;
 using PortalDeProdutosClientes.DTOs;
@@ -10,12 +11,14 @@ namespace PortalDeProdutosClientesAPI.Controllers
     public class ClientesController : ControllerBase
     {
         private readonly IClienteService _clienteService;
+        private readonly IRelatorioPdfService _relatorioPdfService;
         private readonly ILogAuditoriaService _logAuditoriaService;
 
-        public ClientesController(IClienteService clienteService, ILogAuditoriaService logAuditoriaService)
+        public ClientesController(IClienteService clienteService, ILogAuditoriaService logAuditoriaService, IRelatorioPdfService relatorioPdfService)
         {
             _clienteService = clienteService;
             _logAuditoriaService = logAuditoriaService;
+            _relatorioPdfService = relatorioPdfService;
         }
 
         [HttpPost]
@@ -128,5 +131,31 @@ namespace PortalDeProdutosClientesAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("exportar-pdf")]
+        public async Task<IActionResult> ExportarPdf()
+        {
+            var clientes = await _clienteService.ListarTodosClientes(); // ajuste para o método da sua service
+
+            if (!clientes.Any())
+                return NotFound("Nenhum cliente encontrado para gerar o relatório.");
+
+            var colunas = new Dictionary<string, Func<Cliente, string>>
+        {
+            { "ID", c => c.Id.ToString() },
+            { "Nome", c => c.NomeCliente },
+            { "E-mail", c => c.EmailCliente },
+            { "CPF", c => c.Cpf }, // ajuste o nome da propriedade se for Cpf, CpfCnpj, etc.
+        };
+
+            var pdfBytes = _relatorioPdfService.GerarTabelaPdf(
+                "Relatório de Clientes - Portal de Produtos e Clientes",
+                clientes,
+                colunas);
+
+            var nomeArquivo = $"relatorio-clientes-{DateTime.Now:yyyyMMdd-HHmm}.pdf";
+            return File(pdfBytes, "application/pdf", nomeArquivo);
+        }
+
     }
 }
